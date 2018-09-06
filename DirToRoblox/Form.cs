@@ -35,6 +35,10 @@ namespace DirToRoblox
             }
         }
 
+        /// <summary>
+        /// Executed when a Get request is received on the local server
+        /// </summary>
+        /// <param name="result">The passed result</param>
         private void HandleGet(IAsyncResult result)
         {
             // Get the response and write into it
