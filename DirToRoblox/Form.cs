@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -225,7 +226,7 @@ namespace DirToRoblox
         }
 
         /// <summary>
-        /// Begin reacting to get requests and enable file watcher
+        /// Begin reacting to get requests
         /// </summary>
         private void BeginSynchronization()
         {
@@ -246,8 +247,8 @@ namespace DirToRoblox
         }
 
         /// <summary>
-        /// Stop reacting to get requests and disable file watcher
-        /// </summary>
+        /// Stop reacting to get requests
+        /// /// </summary>
         private void StopSynchronization()
         {
             if (toggling || !synchronizing)
@@ -262,6 +263,12 @@ namespace DirToRoblox
 
             toggling = false;
             UpdateVisuals();
+        }
+
+        private void openProjectInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Directory.Exists(path))
+                Process.Start(path);
         }
     }
 }

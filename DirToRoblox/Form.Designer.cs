@@ -38,6 +38,8 @@
             this.statusBox = new StatusBox();
             this.synchronizationButton = new System.Windows.Forms.Button();
             this.watcher = new System.IO.FileSystemWatcher();
+            this.openProjectInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.watcher)).BeginInit();
@@ -57,8 +59,10 @@
             // projectToolStripMenuItem
             // 
             this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSeparator1,
+            this.recentToolStripMenuItem,
             this.openToolStripMenuItem,
-            this.recentToolStripMenuItem});
+            this.openProjectInExplorerToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.projectToolStripMenuItem.Text = "Project";
@@ -66,14 +70,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // recentToolStripMenuItem
             // 
             this.recentToolStripMenuItem.Name = "recentToolStripMenuItem";
-            this.recentToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.recentToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.recentToolStripMenuItem.Text = "Recent";
             // 
             // preferencesToolStripMenuItem
@@ -123,8 +127,21 @@
             // 
             // watcher
             // 
+            this.watcher.EnableRaisingEvents = true;
             this.watcher.IncludeSubdirectories = true;
             this.watcher.SynchronizingObject = this;
+            // 
+            // openProjectInExplorerToolStripMenuItem
+            // 
+            this.openProjectInExplorerToolStripMenuItem.Name = "openProjectInExplorerToolStripMenuItem";
+            this.openProjectInExplorerToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.openProjectInExplorerToolStripMenuItem.Text = "Open project in explorer";
+            this.openProjectInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openProjectInExplorerToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
             // 
             // Form
             // 
@@ -159,6 +176,8 @@
         private System.Windows.Forms.Button synchronizationButton;
         private StatusBox statusBox;
         private System.IO.FileSystemWatcher watcher;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem openProjectInExplorerToolStripMenuItem;
     }
 }
 
