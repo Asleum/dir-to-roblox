@@ -34,13 +34,13 @@
             this.recentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.statusBox = new StatusBox();
+            this.synchronizationButton = new System.Windows.Forms.Button();
+            this.watcher = new System.IO.FileSystemWatcher();
             this.menuStrip.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.watcher)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -50,7 +50,7 @@
             this.preferencesToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(428, 24);
+            this.menuStrip.Size = new System.Drawing.Size(415, 24);
             this.menuStrip.TabIndex = 1;
             this.menuStrip.Text = "Menu";
             // 
@@ -66,14 +66,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // recentToolStripMenuItem
             // 
             this.recentToolStripMenuItem.Name = "recentToolStripMenuItem";
-            this.recentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.recentToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.recentToolStripMenuItem.Text = "Recent";
             // 
             // preferencesToolStripMenuItem
@@ -86,50 +86,52 @@
             // 
             this.browserDialog.Description = "Select the root directory to synchronize with Studio";
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 93);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(428, 22);
-            this.statusStrip1.SizingGrip = false;
-            this.statusStrip1.TabIndex = 3;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(352, 17);
-            this.toolStripStatusLabel1.Text = "Select a directory to synchronize using the \"Project\" menu button";
-            // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.statusBox);
+            this.panel1.Controls.Add(this.synchronizationButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(10);
-            this.panel1.Size = new System.Drawing.Size(428, 69);
+            this.panel1.Size = new System.Drawing.Size(415, 68);
             this.panel1.TabIndex = 4;
             // 
-            // button1
+            // statusBox
             // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.Location = new System.Drawing.Point(10, 10);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(408, 49);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Begin synchronization";
-            this.button1.UseVisualStyleBackColor = true;
+            this.statusBox.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.statusBox.Cursor = System.Windows.Forms.Cursors.Default;
+            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
+            this.statusBox.Location = new System.Drawing.Point(112, 10);
+            this.statusBox.Name = "statusBox";
+            this.statusBox.ReadOnly = true;
+            this.statusBox.Size = new System.Drawing.Size(293, 48);
+            this.statusBox.TabIndex = 1;
+            this.statusBox.Text = "";
+            // 
+            // synchronizationButton
+            // 
+            this.synchronizationButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.synchronizationButton.Location = new System.Drawing.Point(10, 10);
+            this.synchronizationButton.Name = "synchronizationButton";
+            this.synchronizationButton.Size = new System.Drawing.Size(96, 48);
+            this.synchronizationButton.TabIndex = 0;
+            this.synchronizationButton.Text = "Begin synchronization";
+            this.synchronizationButton.UseVisualStyleBackColor = true;
+            this.synchronizationButton.Click += new System.EventHandler(this.synchronizationButton_Click);
+            // 
+            // watcher
+            // 
+            this.watcher.IncludeSubdirectories = true;
+            this.watcher.SynchronizingObject = this;
             // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(428, 115);
+            this.ClientSize = new System.Drawing.Size(415, 92);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip;
@@ -139,9 +141,8 @@
             this.Text = "DirToRoblox";
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.watcher)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -154,10 +155,10 @@
         private System.Windows.Forms.ToolStripMenuItem recentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem preferencesToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog browserDialog;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button synchronizationButton;
+        private StatusBox statusBox;
+        private System.IO.FileSystemWatcher watcher;
     }
 }
 
