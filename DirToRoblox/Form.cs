@@ -19,7 +19,7 @@ namespace DirToRoblox
     {
         private bool synchronizing = false;
         private bool toggling = false;
-        private string path = "C:\\Users\\samue\\Documents\\~Fichiers\\Dev\\Roblox\\OtherProjects\\Finished\\Solitaire\\Sources";
+        private string path = "C:\\Users\\samue\\Documents\\~Fichiers\\Dev\\Roblox\\OtherProjects\\Finished\\Solitaire\\Compiled";
         private List<Dictionary<string, string>> toSend = new List<Dictionary<string, string>>();
 
         private HttpListener listener;
@@ -59,10 +59,10 @@ namespace DirToRoblox
         /// </summary>
         /// <param name="fileName">The file to check</param>
         /// <returns>True if the file is going needs be synchronized</returns>
-        bool IsFileRelevant(string fileName)
+        bool IsFileRelevant(string filePath)
         {
             // We want to watch lua files and directories only
-            return fileName.EndsWith(".lua") || !fileName.Contains('.');
+            return filePath.EndsWith(".lua") || Directory.Exists(filePath);
         }
 
         /// <summary>
@@ -85,23 +85,27 @@ namespace DirToRoblox
 
         private void OnFileCreated(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.Name))
+            if (!IsFileRelevant(e.FullPath))
                 return;
             // To send:
             // - Indication that a file is created
             // - Path of the created file
             // - Contents of the created file (in case it was copied or moved)
+            // - Wether or not the file is actually a folder
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("Type", "Creation");
             data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Content", GetFileContents(e.FullPath));
+            if (Directory.Exists(e.FullPath))
+                data.Add("IsDirectory", "");
+            else
+                data.Add("Content", GetFileContents(e.FullPath));
             toSend.Add(data);
             Console.WriteLine("Created: " + e.Name);
         }
 
         private void OnFileDeleted(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.Name))
+            if (!IsFileRelevant(e.FullPath))
                 return;
             // To send:
             // - Indication that a file is deleted
@@ -123,12 +127,16 @@ namespace DirToRoblox
             // - Indication that something is renamed
             // - Old path of the file
             // - New name of the file
+            // - Wether or not the file is actually a folder
             Dictionary<string, string> data = new Dictionary<string, string>();
             if (!oldRelevant && newRelevant)
             {
                 data.Add("Type", "Creation");
                 data.Add("Path", GetRelativePath(e.FullPath, path));
-                data.Add("Content", GetFileContents(e.FullPath));
+                if (Directory.Exists(e.FullPath))
+                    data.Add("IsDirectory", "");
+                else
+                    data.Add("Content", GetFileContents(e.FullPath));
             } else if (oldRelevant && !newRelevant)
             {
                 data.Add("Type", "Deletion");
@@ -145,18 +153,46 @@ namespace DirToRoblox
 
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.Name))
+            if (!IsFileRelevant(e.FullPath))
                 return;
             // To send:
             // - Indication that something is changed
             // - Path of the file
             // - Content of the file
+            // - Wether or not the file actually is a directory
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("Type", "Modification");
             data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Content", GetFileContents(e.FullPath));
+            if (Directory.Exists(e.FullPath))
+                data.Add("IsDirectory", "");
+            else
+                data.Add("Content", GetFileContents(e.FullPath));
             toSend.Add(data);
             Console.WriteLine("Changed: " + e.Name);
+        }
+
+        /// <summary>
+        /// Register creation events for everything in the synchronized directory
+        /// </summary>
+        private void ManualSend()
+        {
+            foreach (string directory in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+            {
+                Dictionary<string, string> data = new Dictionary<string, string>();
+                data.Add("Type", "Creation");
+                data.Add("Path", GetRelativePath(directory, path));
+                data.Add("IsDirectory", "");
+                toSend.Add(data);
+            }
+            foreach (string file in Directory.GetFiles(path, "*.lua", SearchOption.AllDirectories))
+            {
+                Dictionary<string, string> data = new Dictionary<string, string>();
+                data.Add("Type", "Creation");
+                data.Add("Path", GetRelativePath(file, path));
+                data.Add("Content", GetFileContents(file));
+                toSend.Add(data);
+            }
+            Console.WriteLine("Sent updates for the whole directory");
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -230,11 +266,14 @@ namespace DirToRoblox
         /// </summary>
         private void BeginSynchronization()
         {
-            if (toggling || synchronizing)
+            if (toggling || synchronizing || !Directory.Exists(path))
                 return;
             toggling = true;
             Console.WriteLine("Beginning synchronization");
             UpdateVisuals();
+            toSend.Clear();
+            ManualSend();
+
 
             watcher.Path = path;
             watcher.EnableRaisingEvents = true;
@@ -248,7 +287,7 @@ namespace DirToRoblox
 
         /// <summary>
         /// Stop reacting to get requests
-        /// /// </summary>
+        /// </summary>
         private void StopSynchronization()
         {
             if (toggling || !synchronizing)
@@ -269,6 +308,12 @@ namespace DirToRoblox
         {
             if (Directory.Exists(path))
                 Process.Start(path);
+        }
+
+        private void sendManualUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (synchronizing)
+                ManualSend();
         }
     }
 }

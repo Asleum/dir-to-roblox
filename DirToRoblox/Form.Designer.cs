@@ -30,16 +30,18 @@
         {
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.recentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openProjectInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.statusBox = new StatusBox();
             this.synchronizationButton = new System.Windows.Forms.Button();
             this.watcher = new System.IO.FileSystemWatcher();
-            this.openProjectInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.sendManualUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusBox = new StatusBox();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.watcher)).BeginInit();
@@ -60,12 +62,25 @@
             // 
             this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSeparator1,
-            this.recentToolStripMenuItem,
             this.openToolStripMenuItem,
-            this.openProjectInExplorerToolStripMenuItem});
+            this.recentToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.openProjectInExplorerToolStripMenuItem,
+            this.sendManualUpdateToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.projectToolStripMenuItem.Text = "Project";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
+            // 
+            // recentToolStripMenuItem
+            // 
+            this.recentToolStripMenuItem.Name = "recentToolStripMenuItem";
+            this.recentToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.recentToolStripMenuItem.Text = "Recent";
             // 
             // openToolStripMenuItem
             // 
@@ -74,11 +89,12 @@
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
-            // recentToolStripMenuItem
+            // openProjectInExplorerToolStripMenuItem
             // 
-            this.recentToolStripMenuItem.Name = "recentToolStripMenuItem";
-            this.recentToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
-            this.recentToolStripMenuItem.Text = "Recent";
+            this.openProjectInExplorerToolStripMenuItem.Name = "openProjectInExplorerToolStripMenuItem";
+            this.openProjectInExplorerToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.openProjectInExplorerToolStripMenuItem.Text = "Open project in explorer";
+            this.openProjectInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openProjectInExplorerToolStripMenuItem_Click);
             // 
             // preferencesToolStripMenuItem
             // 
@@ -101,19 +117,6 @@
             this.panel1.Size = new System.Drawing.Size(415, 68);
             this.panel1.TabIndex = 4;
             // 
-            // statusBox
-            // 
-            this.statusBox.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.statusBox.Cursor = System.Windows.Forms.Cursors.Default;
-            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
-            this.statusBox.Location = new System.Drawing.Point(112, 10);
-            this.statusBox.Name = "statusBox";
-            this.statusBox.ReadOnly = true;
-            this.statusBox.Size = new System.Drawing.Size(293, 48);
-            this.statusBox.TabIndex = 1;
-            this.statusBox.Text = "";
-            // 
             // synchronizationButton
             // 
             this.synchronizationButton.Dock = System.Windows.Forms.DockStyle.Left;
@@ -131,17 +134,29 @@
             this.watcher.IncludeSubdirectories = true;
             this.watcher.SynchronizingObject = this;
             // 
-            // openProjectInExplorerToolStripMenuItem
+            // sendManualUpdateToolStripMenuItem
             // 
-            this.openProjectInExplorerToolStripMenuItem.Name = "openProjectInExplorerToolStripMenuItem";
-            this.openProjectInExplorerToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
-            this.openProjectInExplorerToolStripMenuItem.Text = "Open project in explorer";
-            this.openProjectInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openProjectInExplorerToolStripMenuItem_Click);
+            this.sendManualUpdateToolStripMenuItem.Name = "sendManualUpdateToolStripMenuItem";
+            this.sendManualUpdateToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.sendManualUpdateToolStripMenuItem.Text = "Send manual update";
             // 
-            // toolStripSeparator1
+            // statusBox
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
+            this.statusBox.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.statusBox.Cursor = System.Windows.Forms.Cursors.Default;
+            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
+            this.statusBox.Location = new System.Drawing.Point(112, 10);
+            this.statusBox.Name = "statusBox";
+            this.statusBox.ReadOnly = true;
+            this.statusBox.Size = new System.Drawing.Size(293, 48);
+            this.statusBox.TabIndex = 1;
+            this.statusBox.Text = "";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(198, 6);
             // 
             // Form
             // 
@@ -154,7 +169,6 @@
             this.MainMenuStrip = this.menuStrip;
             this.MaximizeBox = false;
             this.Name = "Form";
-            this.ShowInTaskbar = false;
             this.Text = "DirToRoblox";
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
@@ -178,6 +192,8 @@
         private System.IO.FileSystemWatcher watcher;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openProjectInExplorerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sendManualUpdateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 
