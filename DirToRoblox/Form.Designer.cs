@@ -39,10 +39,12 @@
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.statusBox = new StatusBox();
             this.synchronizationButton = new System.Windows.Forms.Button();
             this.filesWatcher = new System.IO.FileSystemWatcher();
             this.directoriesWatcher = new System.IO.FileSystemWatcher();
+            this.statusBox = new System.Windows.Forms.Label();
+            this.clearRecentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recentProjectsSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.filesWatcher)).BeginInit();
@@ -87,6 +89,9 @@
             // 
             // recentToolStripMenuItem
             // 
+            this.recentToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.recentProjectsSeparator,
+            this.clearRecentProjectsToolStripMenuItem});
             this.recentToolStripMenuItem.Name = "recentToolStripMenuItem";
             this.recentToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.recentToolStripMenuItem.Text = "Recent";
@@ -130,19 +135,6 @@
             this.panel1.Size = new System.Drawing.Size(415, 68);
             this.panel1.TabIndex = 4;
             // 
-            // statusBox
-            // 
-            this.statusBox.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.statusBox.Cursor = System.Windows.Forms.Cursors.Default;
-            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
-            this.statusBox.Location = new System.Drawing.Point(112, 10);
-            this.statusBox.Name = "statusBox";
-            this.statusBox.ReadOnly = true;
-            this.statusBox.Size = new System.Drawing.Size(293, 48);
-            this.statusBox.TabIndex = 1;
-            this.statusBox.Text = "";
-            // 
             // synchronizationButton
             // 
             this.synchronizationButton.Dock = System.Windows.Forms.DockStyle.Left;
@@ -156,15 +148,38 @@
             // 
             // filesWatcher
             // 
+            this.filesWatcher.EnableRaisingEvents = true;
             this.filesWatcher.IncludeSubdirectories = true;
             this.filesWatcher.NotifyFilter = ((System.IO.NotifyFilters)((System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.LastWrite)));
             this.filesWatcher.SynchronizingObject = this;
             // 
             // directoriesWatcher
             // 
+            this.directoriesWatcher.EnableRaisingEvents = true;
             this.directoriesWatcher.IncludeSubdirectories = true;
             this.directoriesWatcher.NotifyFilter = System.IO.NotifyFilters.DirectoryName;
             this.directoriesWatcher.SynchronizingObject = this;
+            // 
+            // statusBox
+            // 
+            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
+            this.statusBox.Location = new System.Drawing.Point(112, 10);
+            this.statusBox.Name = "statusBox";
+            this.statusBox.Size = new System.Drawing.Size(293, 48);
+            this.statusBox.TabIndex = 1;
+            // 
+            // clearRecentProjectsToolStripMenuItem
+            // 
+            this.clearRecentProjectsToolStripMenuItem.Name = "clearRecentProjectsToolStripMenuItem";
+            this.clearRecentProjectsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.clearRecentProjectsToolStripMenuItem.Text = "Clear recent projects";
+            this.clearRecentProjectsToolStripMenuItem.Click += new System.EventHandler(this.clearRecentProjectsToolStripMenuItem_Click);
+            // 
+            // recentProjectsSeparator
+            // 
+            this.recentProjectsSeparator.Name = "recentProjectsSeparator";
+            this.recentProjectsSeparator.Size = new System.Drawing.Size(179, 6);
             // 
             // Form
             // 
@@ -197,13 +212,15 @@
         private System.Windows.Forms.FolderBrowserDialog browserDialog;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button synchronizationButton;
-        private StatusBox statusBox;
         private System.IO.FileSystemWatcher filesWatcher;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openProjectInExplorerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendManualUpdateToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.IO.FileSystemWatcher directoriesWatcher;
+        private System.Windows.Forms.Label statusBox;
+        private System.Windows.Forms.ToolStripSeparator recentProjectsSeparator;
+        private System.Windows.Forms.ToolStripMenuItem clearRecentProjectsToolStripMenuItem;
     }
 }
 

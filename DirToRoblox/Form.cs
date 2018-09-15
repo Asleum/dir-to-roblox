@@ -20,6 +20,7 @@ namespace DirToRoblox
         private bool synchronizing = false;
         private bool toggling = false;
         private string path = "C:\\Users\\samue\\Documents\\~Fichiers\\Dev\\Roblox\\OtherProjects\\Finished\\Solitaire\\Compiled";
+        private Properties.Settings settings = Properties.Settings.Default;
         private List<Dictionary<string, string>> toSend = new List<Dictionary<string, string>>();
 
         private HttpListener listener;
@@ -31,7 +32,8 @@ namespace DirToRoblox
 
             InitializeComponent();
             UpdateVisuals();
-            
+            UpdateRecentProjectsList();
+
             filesWatcher.Changed += OnFileChanged;
             filesWatcher.Renamed += OnRenamed;
             filesWatcher.Deleted += OnFileDeleted;
@@ -241,12 +243,54 @@ namespace DirToRoblox
             }
         }
 
+        /// <summary>
+        /// Update the list of recently opened projects in the top menu bar
+        /// </summary>
+        private void UpdateRecentProjectsList()
+        {
+            if (settings.RecentPaths.Count == 0)
+            {
+                recentToolStripMenuItem.Enabled = false;
+            }
+            else
+            {
+                recentToolStripMenuItem.DropDownItems.Clear();
+                recentToolStripMenuItem.DropDownItems.Insert(0, clearRecentProjectsToolStripMenuItem);
+                recentToolStripMenuItem.DropDownItems.Insert(0, recentProjectsSeparator);
+                foreach (string path in settings.RecentPaths)
+                {
+                    Console.WriteLine(path);
+                    ToolStripMenuItem button = new ToolStripMenuItem(path);
+                    button.Click += RecentProjectButton_Click;
+                    recentToolStripMenuItem.DropDownItems.Insert(0, button);
+                }
+                recentToolStripMenuItem.Enabled = true;
+            }
+        }
+
+        private void RecentProjectButton_Click(object sender, EventArgs e)
+        {
+            if (!synchronizing && !toggling)
+            {
+                ToolStripMenuItem item = (ToolStripMenuItem)sender;
+                path = item.Text;
+                UpdateVisuals();
+            }
+        }
+
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (browserDialog.ShowDialog() == DialogResult.OK)
             {
                 path = browserDialog.SelectedPath;
-                Console.WriteLine(path);
+                // Register the path in the recent projects list
+                if (settings.RecentPaths.Contains(path))
+                    settings.RecentPaths.Remove(path);
+                settings.RecentPaths.Add(path);
+                if (settings.RecentPaths.Count > 10)
+                    settings.RecentPaths.RemoveAt(0);
+                settings.Save();
+                UpdateRecentProjectsList();
             }
             UpdateVisuals();
         }
@@ -363,6 +407,13 @@ namespace DirToRoblox
         {
             if (synchronizing)
                 MakeCreationEvents(path);
+        }
+
+        private void clearRecentProjectsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            settings.RecentPaths.Clear();
+            settings.Save();
+            UpdateRecentProjectsList();
         }
     }
 }
