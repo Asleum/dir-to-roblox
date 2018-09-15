@@ -19,7 +19,8 @@ namespace DirToRoblox
     {
         private bool synchronizing = false;
         private bool toggling = false;
-        private string path = "C:\\Users\\samue\\Documents\\~Fichiers\\Dev\\Roblox\\OtherProjects\\Finished\\Solitaire\\Compiled";
+        private bool gotOneRequest = false;
+        private string path;
         private Properties.Settings settings = Properties.Settings.Default;
         private List<Dictionary<string, string>> toSend = new List<Dictionary<string, string>>();
 
@@ -30,6 +31,8 @@ namespace DirToRoblox
             listener = new HttpListener();
             listener.Prefixes.Add("http://localhost:3260/dirtoroblox/");
 
+            if (settings.RecentPaths.Count > 0)
+                path = settings.RecentPaths[settings.RecentPaths.Count - 1];
             InitializeComponent();
             UpdateVisuals();
             UpdateRecentProjectsList();
@@ -313,6 +316,14 @@ namespace DirToRoblox
                 return;
             try
             {
+                if (!gotOneRequest)
+                {
+                    gotOneRequest = true;
+                    this.Invoke(new MethodInvoker(delegate
+                    {
+                        UpdateVisuals();
+                    }));
+                }
                 // Process the data to send
                 var json = JsonConvert.SerializeObject(toSend);
                 toSend.Clear();
@@ -346,8 +357,13 @@ namespace DirToRoblox
                 statusBox.Text = "The selected path does not exist anymore:\n" + path;
             else if (!synchronizing)
                 statusBox.Text = "Ready to synchronize:\n" + path;
+            else if (!gotOneRequest)
+                statusBox.Text = "Activate DirToRoblox plugin inside Roblox Studio to begin synchronization";
             else
                 statusBox.Text = "Synchronizing:\n" + path;
+
+            openProjectInExplorerToolStripMenuItem.Enabled = path != null;
+            sendManualUpdateToolStripMenuItem.Enabled = synchronizing && !toggling && gotOneRequest;
             
         }
 
@@ -372,6 +388,7 @@ namespace DirToRoblox
             listener.Start();
             listener.BeginGetContext(HandleGet, null);
             synchronizing = true;
+            gotOneRequest = false;
 
             toggling = false;
             UpdateVisuals();

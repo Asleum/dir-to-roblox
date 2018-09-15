@@ -30,7 +30,6 @@
         {
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -65,7 +64,6 @@
             // projectToolStripMenuItem
             // 
             this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSeparator1,
             this.openToolStripMenuItem,
             this.recentToolStripMenuItem,
             this.toolStripSeparator2,
@@ -74,11 +72,6 @@
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.projectToolStripMenuItem.Text = "Project";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
             // 
             // openToolStripMenuItem
             // 
@@ -213,7 +206,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button synchronizationButton;
         private System.IO.FileSystemWatcher filesWatcher;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openProjectInExplorerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendManualUpdateToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
