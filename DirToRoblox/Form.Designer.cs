@@ -28,26 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form));
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recentProjectsSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.clearRecentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.openProjectInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendManualUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.statusBox = new System.Windows.Forms.Label();
             this.synchronizationButton = new System.Windows.Forms.Button();
             this.filesWatcher = new System.IO.FileSystemWatcher();
             this.directoriesWatcher = new System.IO.FileSystemWatcher();
-            this.statusBox = new System.Windows.Forms.Label();
-            this.clearRecentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.recentProjectsSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.trayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toggleSynchronizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.filesWatcher)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.directoriesWatcher)).BeginInit();
+            this.trayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip
@@ -89,6 +96,18 @@
             this.recentToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.recentToolStripMenuItem.Text = "Recent";
             // 
+            // recentProjectsSeparator
+            // 
+            this.recentProjectsSeparator.Name = "recentProjectsSeparator";
+            this.recentProjectsSeparator.Size = new System.Drawing.Size(197, 6);
+            // 
+            // clearRecentProjectsToolStripMenuItem
+            // 
+            this.clearRecentProjectsToolStripMenuItem.Name = "clearRecentProjectsToolStripMenuItem";
+            this.clearRecentProjectsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.clearRecentProjectsToolStripMenuItem.Text = "Clear recent projects list";
+            this.clearRecentProjectsToolStripMenuItem.Click += new System.EventHandler(this.clearRecentProjectsToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -128,6 +147,15 @@
             this.panel1.Size = new System.Drawing.Size(415, 68);
             this.panel1.TabIndex = 4;
             // 
+            // statusBox
+            // 
+            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
+            this.statusBox.Location = new System.Drawing.Point(112, 10);
+            this.statusBox.Name = "statusBox";
+            this.statusBox.Size = new System.Drawing.Size(293, 48);
+            this.statusBox.TabIndex = 1;
+            // 
             // synchronizationButton
             // 
             this.synchronizationButton.Dock = System.Windows.Forms.DockStyle.Left;
@@ -153,26 +181,39 @@
             this.directoriesWatcher.NotifyFilter = System.IO.NotifyFilters.DirectoryName;
             this.directoriesWatcher.SynchronizingObject = this;
             // 
-            // statusBox
+            // notifyIcon
             // 
-            this.statusBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.statusBox.Dock = System.Windows.Forms.DockStyle.Right;
-            this.statusBox.Location = new System.Drawing.Point(112, 10);
-            this.statusBox.Name = "statusBox";
-            this.statusBox.Size = new System.Drawing.Size(293, 48);
-            this.statusBox.TabIndex = 1;
+            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon.BalloonTipText = "Activate the DirToRoblox studio plugin to proceed";
+            this.notifyIcon.BalloonTipTitle = "Synchronization initiated";
+            this.notifyIcon.ContextMenuStrip = this.trayContextMenu;
+            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+            this.notifyIcon.Text = "DirToRoblox";
+            this.notifyIcon.Visible = true;
+            this.notifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseDoubleClick);
             // 
-            // clearRecentProjectsToolStripMenuItem
+            // trayContextMenu
             // 
-            this.clearRecentProjectsToolStripMenuItem.Name = "clearRecentProjectsToolStripMenuItem";
-            this.clearRecentProjectsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.clearRecentProjectsToolStripMenuItem.Text = "Clear recent projects";
-            this.clearRecentProjectsToolStripMenuItem.Click += new System.EventHandler(this.clearRecentProjectsToolStripMenuItem_Click);
+            this.trayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleSynchronizationToolStripMenuItem,
+            this.closeToolStripMenuItem});
+            this.trayContextMenu.Name = "trayContextMenu";
+            this.trayContextMenu.Size = new System.Drawing.Size(192, 70);
             // 
-            // recentProjectsSeparator
+            // toggleSynchronizationToolStripMenuItem
             // 
-            this.recentProjectsSeparator.Name = "recentProjectsSeparator";
-            this.recentProjectsSeparator.Size = new System.Drawing.Size(179, 6);
+            this.toggleSynchronizationToolStripMenuItem.Name = "toggleSynchronizationToolStripMenuItem";
+            this.toggleSynchronizationToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.toggleSynchronizationToolStripMenuItem.Text = "Begin synchronization";
+            this.toggleSynchronizationToolStripMenuItem.Click += new System.EventHandler(this.toggleSynchronizationToolStripMenuItem_Click);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.closeToolStripMenuItem.Text = "Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // Form
             // 
@@ -182,6 +223,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
             this.MaximizeBox = false;
             this.Name = "Form";
@@ -191,6 +233,7 @@
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.filesWatcher)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.directoriesWatcher)).EndInit();
+            this.trayContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -213,6 +256,10 @@
         private System.Windows.Forms.Label statusBox;
         private System.Windows.Forms.ToolStripSeparator recentProjectsSeparator;
         private System.Windows.Forms.ToolStripMenuItem clearRecentProjectsToolStripMenuItem;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.ContextMenuStrip trayContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem toggleSynchronizationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
     }
 }
 

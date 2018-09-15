@@ -362,6 +362,18 @@ namespace DirToRoblox
             else
                 statusBox.Text = "Synchronizing:\n" + path;
 
+            if (synchronizing)
+            {
+                toggleSynchronizationToolStripMenuItem.Text = "Stop synchonization";
+                notifyIcon.Text = "DirToRoblox - Synchronizing...";
+            }
+            else
+            {
+                toggleSynchronizationToolStripMenuItem.Text = "Begin synchonization";
+                notifyIcon.Text = "DirToRoblox";
+            }
+            toggleSynchronizationToolStripMenuItem.Enabled = path != null;
+
             openProjectInExplorerToolStripMenuItem.Enabled = path != null;
             sendManualUpdateToolStripMenuItem.Enabled = synchronizing && !toggling && gotOneRequest;
             
@@ -380,7 +392,6 @@ namespace DirToRoblox
             toSend.Clear();
             MakeCreationEvents(path);
 
-
             filesWatcher.Path = path;
             filesWatcher.EnableRaisingEvents = true;
             directoriesWatcher.Path = path;
@@ -391,6 +402,7 @@ namespace DirToRoblox
             gotOneRequest = false;
 
             toggling = false;
+            notifyIcon.ShowBalloonTip(5000);
             UpdateVisuals();
         }
 
@@ -432,5 +444,35 @@ namespace DirToRoblox
             settings.Save();
             UpdateRecentProjectsList();
         }
+
+        private void Form_Closing(object sender, FormClosingEventArgs e)
+        {
+            if (synchronizing)
+            {
+                var prompt = MessageBox.Show("Interrupt synchronization and close DirToRoblox?", "Warning: synchronization in progress", MessageBoxButtons.OKCancel);
+                e.Cancel = prompt == DialogResult.Cancel;
+            }
+        }
+
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void toggleSynchronizationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (synchronizing)
+                StopSynchronization();
+            else
+                BeginSynchronization();
+        }
     }
+
+    
 }
