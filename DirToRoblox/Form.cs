@@ -31,22 +31,25 @@ namespace DirToRoblox
 
             InitializeComponent();
             UpdateVisuals();
-
-            watcher.Changed += OnFileChanged;
-            watcher.Renamed += OnFileRenamed;
-            watcher.Deleted += OnFileDeleted;
-            watcher.Created += OnFileCreated;
+            
+            filesWatcher.Changed += OnFileChanged;
+            filesWatcher.Renamed += OnRenamed;
+            filesWatcher.Deleted += OnFileDeleted;
+            filesWatcher.Created += OnCreated;
+            directoriesWatcher.Renamed += OnRenamed;
+            directoriesWatcher.Deleted += OnDirectoryDeleted;
+            directoriesWatcher.Created += OnCreated;
         }
 
         /// <summary>
-        /// Converts a path to one relative to a folder
+        /// Converts a path to one relative to a folder. Also strips the file extension.
         /// </summary>
         /// <param name="file">The path to shorten</param>
         /// <param name="folder">The new root folder</param>
         /// <returns></returns>
         string GetRelativePath(string file, string folder)
         {
-            Uri pathUri = new Uri(file);
+            Uri pathUri = new Uri(System.IO.Path.ChangeExtension(file, null));
             // Folders must end in a slash
             if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 folder += Path.DirectorySeparatorChar;
@@ -55,14 +58,21 @@ namespace DirToRoblox
         }
 
         /// <summary>
-        /// Wether or not a given file should be included in the synchronization
+        /// Get the Roblox type corresponding to a file or directory
         /// </summary>
-        /// <param name="fileName">The file to check</param>
-        /// <returns>True if the file is going needs be synchronized</returns>
-        bool IsFileRelevant(string filePath)
+        /// <param name="path">The item in the local filesystem to convert</param>
+        /// <returns></returns>
+        string GetClass(string path)
         {
-            // We want to watch lua files and directories only
-            return filePath.EndsWith(".lua") || Directory.Exists(filePath);
+            if (Directory.Exists(path))
+                return "Folder";
+            if (path.EndsWith(".local.lua"))
+                return "LocalScript";
+            if (path.EndsWith(".server.lua"))
+                return "Script";
+            if (path.EndsWith(".lua"))
+                return "ModuleScript";
+            return null;
         }
 
         /// <summary>
@@ -76,96 +86,131 @@ namespace DirToRoblox
             {
                 try {
                     return File.ReadAllText(path);
-                } catch (IOException) when (i < 5) {
-                    Thread.Sleep(50);
+                } catch (IOException) when (i < 5) { // Fired when the file is already being read
+                    Thread.Sleep(30);
                 }
             }
             return null;
         }
 
-        private void OnFileCreated(object sender, FileSystemEventArgs e)
+        private void OnCreated(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.FullPath))
+            var robloxClass = GetClass(e.FullPath);
+            if (robloxClass == null)
                 return;
             // To send:
             // - Indication that a file is created
             // - Path of the created file
             // - Contents of the created file (in case it was copied or moved)
-            // - Wether or not the file is actually a folder
+            // - Roblox class associated to the element
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("Type", "Creation");
             data.Add("Path", GetRelativePath(e.FullPath, path));
-            if (Directory.Exists(e.FullPath))
-                data.Add("IsDirectory", "");
-            else
+            data.Add("Class", robloxClass);
+            if (File.Exists(e.FullPath))
                 data.Add("Content", GetFileContents(e.FullPath));
             toSend.Add(data);
+            // Manually make creation event for a directory's child
+            if (Directory.Exists(e.FullPath))
+                MakeCreationEvents(e.FullPath);
             Console.WriteLine("Created: " + e.Name);
         }
 
         private void OnFileDeleted(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.FullPath))
+            var robloxClass = GetClass(e.FullPath);
+            if (robloxClass == null)
                 return;
             // To send:
             // - Indication that a file is deleted
             // - Path of the file to delete
+            // - Roblox class associated to the element
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("Type", "Deletion");
             data.Add("Path", GetRelativePath(e.FullPath, path));
+            data.Add("Class", robloxClass);
             toSend.Add(data);
             Console.WriteLine("Deleted: " + e.Name);
         }
 
-        private void OnFileRenamed(object sender, RenamedEventArgs e)
+        private void OnDirectoryDeleted(object sender, FileSystemEventArgs e)
         {
-            var oldRelevant = IsFileRelevant(e.OldFullPath);
-            var newRelevant = IsFileRelevant(e.FullPath);
-            if (!oldRelevant && !newRelevant)
-                return;
             // To send:
-            // - Indication that something is renamed
-            // - Old path of the file
-            // - New name of the file
-            // - Wether or not the file is actually a folder
+            // - Indication that a directory is deleted
+            // - Path of the directory to delete
+            // - Roblox class associated to the element
             Dictionary<string, string> data = new Dictionary<string, string>();
-            if (!oldRelevant && newRelevant)
+            data.Add("Type", "Deletion");
+            data.Add("Path", GetRelativePath(e.FullPath, path));
+            data.Add("Class", "Folder");
+            toSend.Add(data);
+            Console.WriteLine("Deleted: " + e.Name);
+        }
+
+        private void OnRenamed(object sender, RenamedEventArgs e)
+        {
+            Console.WriteLine("Renaming: " + e.Name);
+            var oldClass = GetClass(e.OldFullPath);
+            var newClass = GetClass(e.FullPath);
+            //If the renamed element is a directory, oldClass will be null because Directory.Exists returned null, since oldFullPath does not exists anymore. Let's fix that!
+            if (newClass == "Folder")
+                oldClass = "Folder";
+            else if (oldClass == null && newClass == null)
+                return;
+
+            if (oldClass == newClass)
             {
-                data.Add("Type", "Creation");
-                data.Add("Path", GetRelativePath(e.FullPath, path));
-                if (Directory.Exists(e.FullPath))
-                    data.Add("IsDirectory", "");
-                else
-                    data.Add("Content", GetFileContents(e.FullPath));
-            } else if (oldRelevant && !newRelevant)
-            {
-                data.Add("Type", "Deletion");
-                data.Add("Path", GetRelativePath(e.OldFullPath, path));
-            } else
-            {
+                // To send:
+                // - Indication that something is renamed
+                // - Old path of the file
+                // - New name of the file
+                // - Roblox class associated to the element
+                Dictionary<string, string> data = new Dictionary<string, string>();
                 data.Add("Type", "Renaming");
                 data.Add("Path", GetRelativePath(e.OldFullPath, path));
-                data.Add("NewName", e.Name);
+                data.Add("NewName", Path.GetFileNameWithoutExtension(e.Name));
+                data.Add("Class", newClass);
+                toSend.Add(data);
+            } else
+            {
+                // Send a deletion for the old item, followed by a creation for the new one
+                if (oldClass != null)
+                {
+                    Dictionary<string, string> data = new Dictionary<string, string>();
+                    data.Add("Type", "Deletion");
+                    data.Add("Path", GetRelativePath(e.OldFullPath, path));
+                    data.Add("Class", oldClass);
+                    toSend.Add(data);
+                }
+                if (newClass != null)
+                {
+                    Dictionary<string, string> data = new Dictionary<string, string>();
+                    data.Add("Type", "Creation");
+                    data.Add("Path", GetRelativePath(e.FullPath, path));
+                    data.Add("Class", newClass);
+                    if (File.Exists(e.FullPath))
+                        data.Add("Content", GetFileContents(e.FullPath));
+                    toSend.Add(data);
+                }
             }
-            toSend.Add(data);
             Console.WriteLine("Renamed: " + e.Name);
         }
 
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
-            if (!IsFileRelevant(e.FullPath))
+            var robloxClass = GetClass(e.FullPath);
+            if (robloxClass == null)
                 return;
             // To send:
             // - Indication that something is changed
             // - Path of the file
             // - Content of the file
-            // - Wether or not the file actually is a directory
+            // - Roblox class associated to the element
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add("Type", "Modification");
             data.Add("Path", GetRelativePath(e.FullPath, path));
-            if (Directory.Exists(e.FullPath))
-                data.Add("IsDirectory", "");
-            else
+            data.Add("Class", robloxClass);
+            if (File.Exists(e.FullPath))
                 data.Add("Content", GetFileContents(e.FullPath));
             toSend.Add(data);
             Console.WriteLine("Changed: " + e.Name);
@@ -173,26 +218,27 @@ namespace DirToRoblox
 
         /// <summary>
         /// Register creation events for everything in the synchronized directory
+        /// <param name="path">The directory to send</param>
         /// </summary>
-        private void ManualSend()
+        private void MakeCreationEvents(string parentDirectory)
         {
-            foreach (string directory in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
+            foreach (string directory in Directory.GetDirectories(parentDirectory, "*", SearchOption.AllDirectories))
             {
                 Dictionary<string, string> data = new Dictionary<string, string>();
                 data.Add("Type", "Creation");
                 data.Add("Path", GetRelativePath(directory, path));
-                data.Add("IsDirectory", "");
+                data.Add("Class", "Folder");
                 toSend.Add(data);
             }
-            foreach (string file in Directory.GetFiles(path, "*.lua", SearchOption.AllDirectories))
+            foreach (string file in Directory.GetFiles(parentDirectory, "*.lua", SearchOption.AllDirectories))
             {
                 Dictionary<string, string> data = new Dictionary<string, string>();
                 data.Add("Type", "Creation");
                 data.Add("Path", GetRelativePath(file, path));
+                data.Add("Class", GetClass(file));
                 data.Add("Content", GetFileContents(file));
                 toSend.Add(data);
             }
-            Console.WriteLine("Sent updates for the whole directory");
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -272,11 +318,13 @@ namespace DirToRoblox
             Console.WriteLine("Beginning synchronization");
             UpdateVisuals();
             toSend.Clear();
-            ManualSend();
+            MakeCreationEvents(path);
 
 
-            watcher.Path = path;
-            watcher.EnableRaisingEvents = true;
+            filesWatcher.Path = path;
+            filesWatcher.EnableRaisingEvents = true;
+            directoriesWatcher.Path = path;
+            directoriesWatcher.EnableRaisingEvents = true;
             listener.Start();
             listener.BeginGetContext(HandleGet, null);
             synchronizing = true;
@@ -296,7 +344,8 @@ namespace DirToRoblox
             Console.WriteLine("Stopping synchronization");
             UpdateVisuals();
 
-            watcher.EnableRaisingEvents = false;
+            filesWatcher.EnableRaisingEvents = false;
+            directoriesWatcher.EnableRaisingEvents = false;
             listener.Stop();
             synchronizing = false;
 
@@ -313,7 +362,7 @@ namespace DirToRoblox
         private void sendManualUpdateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (synchronizing)
-                ManualSend();
+                MakeCreationEvents(path);
         }
     }
 }
