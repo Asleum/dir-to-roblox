@@ -36,5 +36,111 @@ namespace DirToRoblox.Properties {
                 this["RecentPaths"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>.local.lua</string>
+  <string>.localscript.lua</string>
+  <string>.client.lua</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection LocalExtensions {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["LocalExtensions"]));
+            }
+            set {
+                this["LocalExtensions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>.script.lua</string>
+  <string>.server.lua</string>
+  <string>.global.lua</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection ScriptExtensions {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["ScriptExtensions"]));
+            }
+            set {
+                this["ScriptExtensions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowNotification {
+            get {
+                return ((bool)(this["ShowNotification"]));
+            }
+            set {
+                this["ShowNotification"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoMinimize {
+            get {
+                return ((bool)(this["AutoMinimize"]));
+            }
+            set {
+                this["AutoMinimize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowInTaskbar {
+            get {
+                return ((bool)(this["ShowInTaskbar"]));
+            }
+            set {
+                this["ShowInTaskbar"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3260")]
+        public int Port {
+            get {
+                return ((int)(this["Port"]));
+            }
+            set {
+                this["Port"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TruncateLua {
+            get {
+                return ((bool)(this["TruncateLua"]));
+            }
+            set {
+                this["TruncateLua"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TruncateLocalScript {
+            get {
+                return ((bool)(this["TruncateLocalScript"]));
+            }
+            set {
+                this["TruncateLocalScript"] = value;
+            }
+        }
     }
 }
