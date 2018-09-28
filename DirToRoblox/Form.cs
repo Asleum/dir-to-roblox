@@ -1,16 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DirToRoblox
@@ -29,8 +19,8 @@ namespace DirToRoblox
             UpdateRecentProjectsList();
             ApplySettings();
 
-            // var settingsForm = new SettingsForm();
-            // settingsForm.ShowDialog();
+            var settingsForm = new SettingsForm();
+            settingsForm.ShowDialog();
         }
 
         /// <summary>
@@ -203,6 +193,11 @@ namespace DirToRoblox
         private void toggleSynchronizationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToggleSynchronization();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 
