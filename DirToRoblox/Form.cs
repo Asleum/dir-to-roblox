@@ -19,8 +19,8 @@ namespace DirToRoblox
             UpdateRecentProjectsList();
             ApplySettings();
 
-            // var settingsForm = new SettingsForm();
-            // settingsForm.ShowDialog();
+            var settingsForm = new SettingsForm();
+            settingsForm.ShowDialog();
         }
 
         /// <summary>
@@ -199,6 +199,11 @@ namespace DirToRoblox
         private void toggleSynchronizationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToggleSynchronization();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 
