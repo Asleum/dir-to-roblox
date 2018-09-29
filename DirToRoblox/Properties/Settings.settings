@@ -12,16 +12,22 @@
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
   &lt;string&gt;.local.lua&lt;/string&gt;
+  &lt;string&gt;.local.moon&lt;/string&gt;
   &lt;string&gt;.localscript.lua&lt;/string&gt;
+  &lt;string&gt;.localscript.moon&lt;/string&gt;
   &lt;string&gt;.client.lua&lt;/string&gt;
+  &lt;string&gt;.client.moon&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="ScriptExtensions" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;.script.lua&lt;/string&gt;
-  &lt;string&gt;.server.lua&lt;/string&gt;
   &lt;string&gt;.global.lua&lt;/string&gt;
+  &lt;string&gt;.global.moon&lt;/string&gt;
+  &lt;string&gt;.script.lua&lt;/string&gt;
+  &lt;string&gt;.script.moon&lt;/string&gt;
+  &lt;string&gt;.server.lua&lt;/string&gt;
+  &lt;string&gt;.server.moon&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="ShowNotification" Type="System.Boolean" Scope="User">

@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DirToRoblox
@@ -107,20 +106,15 @@ namespace DirToRoblox
             toSend.Clear();
             foreach (string directory in Directory.GetDirectories(parentDirectory, "*", SearchOption.AllDirectories))
             {
-                Dictionary<string, string> data = new Dictionary<string, string>();
-                data.Add("Type", "Creation");
-                data.Add("Path", GetRelativePath(directory, path));
-                data.Add("Class", "Folder");
-                toSend.Add(data);
+                MakeModificationEvent(directory, "Folder");
             }
             foreach (string file in Directory.GetFiles(parentDirectory, "*.lua", SearchOption.AllDirectories))
             {
-                Dictionary<string, string> data = new Dictionary<string, string>();
-                data.Add("Type", "Creation");
-                data.Add("Path", GetRelativePath(file, path));
-                data.Add("Class", GetClass(file));
-                data.Add("Content", GetFileContents(file));
-                toSend.Add(data);
+                MakeModificationEvent(file, GetClass(file));
+            }
+            foreach (string file in Directory.GetFiles(parentDirectory, "*.moon", SearchOption.AllDirectories))
+            {
+                MakeModificationEvent(file, GetClass(file));
             }
         }
 
@@ -207,7 +201,7 @@ namespace DirToRoblox
                 if (path.EndsWith(extension))
                     return "Script";
             }
-            if (path.EndsWith(".lua"))
+            if (path.EndsWith(".lua") || path.EndsWith(".moon"))
                 return "ModuleScript";
             return null;
         }
@@ -233,24 +227,48 @@ namespace DirToRoblox
         }
 
         /// <summary>
-        /// Read the contents of a file as a string
+        /// Read the contents of a file as a string, and compile it if it's moonscript
         /// </summary>
         /// <param name="path">The file to read</param>
         /// <returns>The contents of the given file</returns>
         string GetFileContents(string path)
         {
+            string content = null;
             for (int i = 0; i < 5; i++)
             {
                 try
                 {
-                    return File.ReadAllText(path);
+                    content = File.ReadAllText(path);
+                    break;
                 }
                 catch (IOException) when (i < 5)
                 { // Fired when the file is already being read
                     Thread.Sleep(30);
                 }
             }
-            return null;
+            if (path.EndsWith(".moon")) // MOONSCRIPT ALERT
+            {
+                // Initialize the compilation process
+                var compilationProcess = new Process();
+                var info = compilationProcess.StartInfo;
+                info.CreateNoWindow = true;
+                info.FileName = "cmd.exe";
+                // /C is a parameter for cmd.exe, it indicates that we want to just execute the given command, then close
+                // The -- parameters indicate that we want to read from stdin and output the compiled moonscript in stdout
+                info.Arguments = "/C moonc --";
+                info.UseShellExecute = false;
+                info.RedirectStandardOutput = true;
+                info.RedirectStandardInput = true;
+
+                // Now let's run this bad boy
+                compilationProcess.Start();
+                compilationProcess.StandardInput.WriteLine(content);
+                compilationProcess.StandardInput.Close();
+                var compiled = compilationProcess.StandardOutput.ReadToEnd();
+                compilationProcess.WaitForExit();
+                return compiled;
+            }
+            return content;
         }
 
         /// <summary>
@@ -267,6 +285,7 @@ namespace DirToRoblox
                 if (!gotOneRequest)
                 {
                     gotOneRequest = true;
+                    // Not using that delegate thingy leads C# to complain about threads being wrong
                     form.Invoke(new MethodInvoker(delegate
                     {
                         form.UpdateVisuals();
@@ -275,7 +294,6 @@ namespace DirToRoblox
 
                 // Process the data to send
                 var json = JsonConvert.SerializeObject(toSend);
-                Console.WriteLine(toSend.Count);
                 toSend.Clear();
 
                 // Get the response and write into it
@@ -294,27 +312,57 @@ namespace DirToRoblox
         #endregion
 
         #region File watchers events
+
+        private void MakeModificationEvent(string file, string robloxClass)
+        {
+            // To send:
+            // - Indication that something is changed
+            // - Path of the file
+            // - Content of the file (if not a folder)
+            // - Roblox class associated to the element
+            var data = new Dictionary<string, string>();
+            data.Add("Type", "Modification");
+            data.Add("Path", GetRelativePath(file, path));
+            data.Add("Class", robloxClass);
+            if (File.Exists(file))
+                data.Add("Content", GetFileContents(file));
+            toSend.Add(data);
+        }
+
+        private void MakeDeletionEvent(string file, string robloxClass)
+        {
+            // To send:
+            // - Indication that a file is deleted
+            // - Path of the file to delete
+            // - Roblox class associated to the element
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add("Type", "Deletion");
+            data.Add("Path", GetRelativePath(file, path));
+            data.Add("Class", robloxClass);
+            toSend.Add(data);
+        }
+
         private void OnCreated(object sender, FileSystemEventArgs e)
         {
             var robloxClass = GetClass(e.FullPath);
             if (robloxClass == null)
                 return;
-            // To send:
-            // - Indication that a file is created
-            // - Path of the created file
-            // - Contents of the created file (in case it was copied or moved)
-            // - Roblox class associated to the element
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("Type", "Creation");
-            data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Class", robloxClass);
-            if (File.Exists(e.FullPath))
-                data.Add("Content", GetFileContents(e.FullPath));
-            toSend.Add(data);
+            // Even though we're dealing with a creation, we're sending a modification because those are handled exactly the same way
+            MakeModificationEvent(e.FullPath, robloxClass);
+
             // Manually make creation event for a directory's child
             if (Directory.Exists(e.FullPath))
                 MakeCreationEvents(e.FullPath);
             Console.WriteLine("Created: " + e.Name);
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            var robloxClass = GetClass(e.FullPath);
+            if (robloxClass == null)
+                return;
+            MakeModificationEvent(e.FullPath, robloxClass);
+            Console.WriteLine("Changed: " + e.Name);
         }
 
         private void OnFileDeleted(object sender, FileSystemEventArgs e)
@@ -322,29 +370,13 @@ namespace DirToRoblox
             var robloxClass = GetClass(e.FullPath);
             if (robloxClass == null)
                 return;
-            // To send:
-            // - Indication that a file is deleted
-            // - Path of the file to delete
-            // - Roblox class associated to the element
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("Type", "Deletion");
-            data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Class", robloxClass);
-            toSend.Add(data);
+            MakeDeletionEvent(e.FullPath, robloxClass);
             Console.WriteLine("Deleted: " + e.Name);
         }
 
         private void OnDirectoryDeleted(object sender, FileSystemEventArgs e)
         {
-            // To send:
-            // - Indication that a directory is deleted
-            // - Path of the directory to delete
-            // - Roblox class associated to the element
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("Type", "Deletion");
-            data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Class", "Folder");
-            toSend.Add(data);
+            MakeDeletionEvent(e.FullPath, "Folder");
             Console.WriteLine("Deleted: " + e.Name);
         }
 
@@ -377,46 +409,13 @@ namespace DirToRoblox
             {
                 // Send a deletion for the old item, followed by a creation for the new one
                 if (oldClass != null)
-                {
-                    Dictionary<string, string> data = new Dictionary<string, string>();
-                    data.Add("Type", "Deletion");
-                    data.Add("Path", GetRelativePath(e.OldFullPath, path));
-                    data.Add("Class", oldClass);
-                    toSend.Add(data);
-                }
+                    MakeDeletionEvent(e.OldFullPath, oldClass);
                 if (newClass != null)
-                {
-                    Dictionary<string, string> data = new Dictionary<string, string>();
-                    data.Add("Type", "Creation");
-                    data.Add("Path", GetRelativePath(e.FullPath, path));
-                    data.Add("Class", newClass);
-                    if (File.Exists(e.FullPath))
-                        data.Add("Content", GetFileContents(e.FullPath));
-                    toSend.Add(data);
-                }
+                    MakeModificationEvent(e.FullPath, newClass);
             }
             Console.WriteLine("Renamed: " + e.Name);
         }
 
-        private void OnFileChanged(object sender, FileSystemEventArgs e)
-        {
-            var robloxClass = GetClass(e.FullPath);
-            if (robloxClass == null)
-                return;
-            // To send:
-            // - Indication that something is changed
-            // - Path of the file
-            // - Content of the file
-            // - Roblox class associated to the element
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add("Type", "Modification");
-            data.Add("Path", GetRelativePath(e.FullPath, path));
-            data.Add("Class", robloxClass);
-            if (File.Exists(e.FullPath))
-                data.Add("Content", GetFileContents(e.FullPath));
-            toSend.Add(data);
-            Console.WriteLine("Changed: " + e.Name);
-        }
         #endregion
     }
 }

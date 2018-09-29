@@ -1,16 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DirToRoblox
@@ -136,6 +126,12 @@ namespace DirToRoblox
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
             synchronizer.SetPath(item.Text);
             UpdateVisuals();
+
+            // Put the project at the top of the recent list
+            settings.RecentPaths.Remove(item.Text);
+            settings.RecentPaths.Add(item.Text);
+            settings.Save();
+            UpdateRecentProjectsList();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)

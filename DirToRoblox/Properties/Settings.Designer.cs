@@ -42,8 +42,11 @@ namespace DirToRoblox.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <string>.local.lua</string>
+  <string>.local.moon</string>
   <string>.localscript.lua</string>
+  <string>.localscript.moon</string>
   <string>.client.lua</string>
+  <string>.client.moon</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection LocalExtensions {
             get {
@@ -58,9 +61,12 @@ namespace DirToRoblox.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>.script.lua</string>
-  <string>.server.lua</string>
   <string>.global.lua</string>
+  <string>.global.moon</string>
+  <string>.script.lua</string>
+  <string>.script.moon</string>
+  <string>.server.lua</string>
+  <string>.server.moon</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection ScriptExtensions {
             get {
